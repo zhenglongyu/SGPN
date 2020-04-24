@@ -276,14 +276,14 @@ def tooth2blocks_plus_normalized(data_label, num_point, block_size, stride,
     inslabel = np.nanmax(data_label[:, 3:], axis=1)
     data[:, 3:6] = np.ones((np.size(data,0),3))
     label = np.zeros((np.size(data,0), 1)).astype(np.uint8)
-    inslabel-=(np.nanmin(inslabel,axis=0)-1)
+    inslabel-=(np.nanmin(inslabel,axis=0))
     label[np.isnan(inslabel)] = 1
-    inslabel[np.isnan(inslabel)]=1
+    inslabel[np.isnan(inslabel)]=0
     ins_max=np.max(inslabel,axis=0)
     ins_sec_max=np.max(inslabel[inslabel!=ins_max],axis=0)
     if (ins_max-ins_sec_max)>1:
         label[inslabel==ins_max]=1
-        inslabel[inslabel==ins_max]=1
+        inslabel[inslabel==ins_max]=0
     # label = data_label[:, -2].astype(np.uint8)
     # inslabel = data_label[:, -1].astype(np.uint8)
     max_room_x = max(data[:, 0])
