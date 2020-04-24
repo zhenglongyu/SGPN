@@ -20,7 +20,7 @@ parser = argparse.ArgumentParser()
 # Experiment Settings
 parser.add_argument('--gpu', type=str, default="1", help='GPU to use [default: GPU 1]')
 parser.add_argument('--wd', type=float, default=0.9, help='Weight Decay [Default: 0.0]')
-parser.add_argument('--epoch', type=int, default=200, help='Number of epochs [default: 50]')
+parser.add_argument('--epoch', type=int, default=50, help='Number of epochs [default: 50]')
 parser.add_argument('--batch', type=int, default=4, help='Batch Size during training [default: 4]')
 parser.add_argument('--point_num', type=int, default=4096, help='Point Number')
 parser.add_argument('--group_num', type=int, default=50, help='Maximum Group Number in one pc')
@@ -29,9 +29,9 @@ parser.add_argument('--margin_same', type=float, default=10., help='Double hinge
 parser.add_argument('--margin_diff', type=float, default=80., help='Double hinge loss margin: different semantic')
 
 # Input&Output Settings
-parser.add_argument('--output_dir', type=str, default='checkpoint/stanford_sem_seg', help='Directory that stores all training logs and trained models')
-parser.add_argument('--input_list', type=str, default='data/train_hdf5_file_list.txt', help='Input data list file')
-parser.add_argument('--restore_model', type=str, default='checkpoint/stanford_ins_seg', help='Pretrained model')
+parser.add_argument('--output_dir', type=str, default='checkpoint/tooth_sem_seg', help='Directory that stores all training logs and trained models')
+parser.add_argument('--input_list', type=str, default='data/tooth_ins_seg_hdf5', help='Input data list file')
+parser.add_argument('--restore_model', type=str, default='checkpoint/tooth_ins_seg', help='Pretrained model')
 
 FLAGS = parser.parse_args()
 
@@ -145,7 +145,10 @@ def train():
 
         train_writer = tf.summary.FileWriter(SUMMARIES_FOLDER + '/train', sess.graph)
 
-        train_file_list = provider.getDataFiles(TRAINING_FILE_LIST)
+        import glob
+
+        train_file_list= glob.glob(os.path.join(TRAINING_FILE_LIST,'*.h5'))
+        # train_file_list=provider.getDataFiles(TRAINING_FILE_LIST)
         num_train_file = len(train_file_list)
 
         fcmd = open(os.path.join(LOG_STORAGE_PATH, 'cmd.txt'), 'w')
@@ -228,7 +231,10 @@ def train():
 
 
                 if j % 10 == 9:
-                    printout(flog, 'Batch: %d, loss: %f, grouperr: %f, same: %f, diff: %f, pos: %f' % (j, total_loss/10, total_grouperr/10, total_same/same_cnt0, total_diff/10, total_pos/10))
+                    if same_cnt0!=0:
+                        printout(flog, 'Batch: %d, loss: %f, grouperr: %f, same: %f, diff: %f, pos: %f' % (j, total_loss/10, total_grouperr/10, total_same/same_cnt0, total_diff/10, total_pos/10))
+                    else:
+                        printout(flog, 'Batch: %d, loss: %f, grouperr: %f, same: %f, diff: %f, pos: %f' % (j, total_loss/10, total_grouperr/10, 1e10, total_diff/10, total_pos/10))
 
                     lr_sum, batch_sum, train_loss_sum, group_err_sum = sess.run( \
                         [lr_op, batch, total_train_loss_sum_op, group_err_op], \
