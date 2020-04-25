@@ -223,7 +223,8 @@ def train():
                 _, loss_val, simmat_val, grouperr_val, same_val, same_cnt_val, diff_val, diff_cnt_val, pos_val, pos_cnt_val = sess.run([train_op, loss, net_output['simmat'], grouperr, same, same_cnt, diff, diff_cnt, pos, pos_cnt], feed_dict=feed_dict)
                 total_loss += loss_val
                 total_grouperr += grouperr_val
-                total_diff += (diff_val / diff_cnt_val)
+                if diff_cnt_val!=0:
+                    total_diff += (diff_val / diff_cnt_val)
                 if same_cnt_val > 0:
                     total_same += same_val / same_cnt_val
                     same_cnt0 += 1
